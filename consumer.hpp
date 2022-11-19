@@ -1,67 +1,69 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "thread.hpp"
-#include "ts_queue.hpp"
+
 #include "item.hpp"
+#include "thread.hpp"
 #include "transformer.hpp"
+#include "ts_queue.hpp"
 
 #ifndef CONSUMER_HPP
 #define CONSUMER_HPP
 
 class Consumer : public Thread {
-public:
-	// constructor
-	Consumer(TSQueue<Item*>* worker_queue, TSQueue<Item*>* output_queue, Transformer* transformer);
+   public:
+    // constructor
+    Consumer(TSQueue<Item*>* worker_queue, TSQueue<Item*>* output_queue, Transformer* transformer);
 
-	// destructor
-	~Consumer();
+    // destructor
+    ~Consumer();
 
-	virtual void start() override;
+    virtual void start() override;
 
-	virtual int cancel() override;
-private:
-	TSQueue<Item*>* worker_queue;
-	TSQueue<Item*>* output_queue;
+    virtual int cancel() override;
 
-	Transformer* transformer;
+   private:
+    TSQueue<Item*>* worker_queue;
+    TSQueue<Item*>* output_queue;
 
-	bool is_cancel;
+    Transformer* transformer;
 
-	// the method for pthread to create a consumer thread
-	static void* process(void* arg);
+    bool is_cancel;
+
+    // the method for pthread to create a consumer thread
+    static void* process(void* arg);
 };
 
 Consumer::Consumer(TSQueue<Item*>* worker_queue, TSQueue<Item*>* output_queue, Transformer* transformer)
-	: worker_queue(worker_queue), output_queue(output_queue), transformer(transformer) {
-	is_cancel = false;
+    : worker_queue(worker_queue), output_queue(output_queue), transformer(transformer) {
+    is_cancel = false;
 }
 
 Consumer::~Consumer() {}
 
 void Consumer::start() {
-	// TODO: starts a Consumer thread
+    // TODO: starts a Consumer thread
 }
 
 int Consumer::cancel() {
-	// TODO: cancels the consumer thread
+    // TODO: cancels the consumer thread
 }
 
 void* Consumer::process(void* arg) {
-	Consumer* consumer = (Consumer*)arg;
+    Consumer* consumer = (Consumer*)arg;
 
-	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, nullptr);
+    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, nullptr);
 
-	while (!consumer->is_cancel) {
-		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, nullptr);
+    while (!consumer->is_cancel) {
+        pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, nullptr);
 
-		// TODO: implements the Consumer's work
+        // TODO: implements the Consumer's work
 
-		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
-	}
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
+    }
 
-	delete consumer;
+    delete consumer;
 
-	return nullptr;
+    return nullptr;
 }
 
-#endif // CONSUMER_HPP
+#endif  // CONSUMER_HPP
