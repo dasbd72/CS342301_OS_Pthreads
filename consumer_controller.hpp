@@ -68,10 +68,31 @@ ConsumerController::~ConsumerController() {}
 
 void ConsumerController::start() {
     // TODO: starts a ConsumerController thread
+    pthread_create(&t, 0, ConsumerController::process, (void*)this);
 }
 
 void* ConsumerController::process(void* arg) {
     // TODO: implements the ConsumerController's work
+    ConsumerController* controller = (ConsumerController*)arg;
+
+    while (true) {
+        if (controller->worker_queue->get_size() > controller->high_threshold) {
+            printf("Scaling up consumers from %d to %d\n", controller->consumers.size(), controller->consumers.size() + 1);
+
+            Consumer* consumer = new Consumer(controller->worker_queue, controller->writer_queue, controller->transformer);
+            consumer->start();
+            controller->consumers.push_back(consumer);
+        } else if (controller->worker_queue->get_size() < controller->low_threshold && controller->consumers.size() > 1) {
+            printf("Scaling down consumers from %d to %d\n", controller->consumers.size(), controller->consumers.size() - 1);
+
+            Consumer* consumer = controller->consumers.back();
+            controller->consumers.pop_back();
+            consumer->cancel();
+        }
+        usleep(controller->check_period);
+    }
+
+    return nullptr;
 }
 
 #endif  // CONSUMER_CONTROLLER_HPP

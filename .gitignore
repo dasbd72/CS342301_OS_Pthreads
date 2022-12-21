@@ -9,3 +9,5 @@ consumer_test
 ts_queue_test
 tests/*.out
 *.dSYM
+transformer.cpp
+pthread.test.sh
