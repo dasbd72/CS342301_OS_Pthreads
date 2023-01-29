@@ -11,3 +11,4 @@ tests/*.out
 *.dSYM
 transformer.cpp
 pthread.test.sh
+pthread.exp.sh
